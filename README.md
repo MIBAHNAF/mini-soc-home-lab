@@ -1,4 +1,4 @@
-\# Mini-SOC Home Lab
+# Mini-SOC Home Lab
 
 
 

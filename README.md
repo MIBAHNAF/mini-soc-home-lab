@@ -2,30 +2,43 @@
 
 ## Overview
 
-This project simulates a small-scale Security Operations Center (SOC) environment using Wazuh SIEM.
-The goal is to centralize log collection, validate detection capabilities, and document incident response workflows in a controlled virtual lab.
+This project simulates a small-scale Security Operations Center (SOC) environment using Wazuh SIEM. The goal is to centralize log collection, validate detection capabilities, and document incident response workflows in a controlled virtual lab.
 
-Phase 1 focuses on deploying the SIEM infrastructure.
+Phase 1 focused on deploying the SIEM infrastructure, validating service health, confirming open communication ports, and restoring dashboard access after a routing issue.
 
 ---
 
 ## Lab Environment
 
-**Hypervisor:** VMware
-**SIEM Platform:** Wazuh 4.7.x
-**Server OS:** Ubuntu 24.04 LTS
-**Network Mode:** NAT (VMnet8)
-**Server IP:** 192.168.152.128
+- **Hypervisor:** VMware
+- **SIEM Platform:** Wazuh 4.7.x
+- **Server OS:** Ubuntu 24.04 LTS
+- **Network Mode:** NAT (VMnet8)
+- **Server IP:** `192.168.152.128`
 
 ### Wazuh Server VM Configuration
 
-* 4 vCPUs
-* ~5 GB RAM
-* 20 GB disk
+- 4 vCPUs
+- 4.9 GB RAM
+- 20 GB disk
 
 ---
 
-## Phase 1 – Wazuh SIEM Deployment
+## Repository Structure
+
+```text
+mini-soc-home-lab/
+|-- architecture/
+|-- detections/
+|-- incident-reports/
+|-- screenshots/
+|-- lab-notes.md
+`-- README.md
+```
+
+---
+
+## Phase 1 - Wazuh SIEM Deployment
 
 ### 1. System Preparation
 
@@ -44,8 +57,7 @@ sudo bash wazuh-install.sh -a -i
 ```
 
 Note:
-Ubuntu 24.04 was not officially listed in the installer’s supported OS check.
-The `-i` flag was used to bypass OS validation in this lab environment.
+Ubuntu 24.04 was not officially listed in the installer's supported OS check. The `-i` flag was used to bypass OS validation in this lab environment.
 
 ---
 
@@ -67,10 +79,10 @@ All services confirmed running.
 
 Confirmed listening ports:
 
-* 1514 – Agent log ingestion
-* 1515 – Agent registration
-* 55000 – Wazuh API
-* 443 – Wazuh Dashboard
+- 1514 - Agent log ingestion
+- 1515 - Agent registration
+- 55000 - Wazuh API
+- 443 - Wazuh Dashboard
 
 Verified using:
 
@@ -84,7 +96,7 @@ sudo netstat -tulnp | grep -E "1514|1515|55000|443"
 
 Dashboard accessed via:
 
-```
+```text
 https://192.168.152.128
 ```
 
@@ -92,9 +104,9 @@ Successfully authenticated using generated admin credentials.
 
 Initial state:
 
-* Total agents: 0
-* Active agents: 0
-* Disconnected agents: 0
+- Total agents: 0
+- Active agents: 0
+- Disconnected agents: 0
 
 ---
 
@@ -104,23 +116,18 @@ Wazuh SIEM infrastructure successfully deployed and operational.
 
 Next Phase:
 
-* Deploy Windows endpoint VM
-* Install Wazuh agent
-* Validate Windows Event Log ingestion
-* Begin detection engineering
+- Deploy Windows endpoint VM
+- Install Wazuh agent
+- Validate Windows Event Log ingestion
+- Begin detection engineering
 
 ---
 
 ## What This Demonstrates
 
-* Enterprise SIEM deployment
-* Linux service management
-* Network port verification
-* TLS dashboard configuration
-* Virtualization best practices
-* Troubleshooting OS compatibility issues
-
-
-
-
-
+- Enterprise SIEM deployment
+- Linux service management
+- Network port verification
+- TLS dashboard configuration
+- Virtualization best practices
+- Troubleshooting OS compatibility issues

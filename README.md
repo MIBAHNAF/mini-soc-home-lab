@@ -4,7 +4,7 @@
 
 This project simulates a small-scale Security Operations Center (SOC) environment using Wazuh SIEM. The goal is to centralize log collection, validate detection capabilities, and document incident response workflows in a controlled virtual lab.
 
-Phase 1 focused on deploying the SIEM infrastructure, validating service health, confirming open communication ports, and restoring dashboard access after a routing issue.
+Phase 1 focused on deploying the SIEM infrastructure, validating service health, confirming open communication ports, and restoring dashboard access after a routing issue. Phase 2 extended the lab by onboarding a Windows 11 endpoint, validating agent connectivity, and confirming that Windows event data was successfully reaching the Wazuh dashboard.
 
 ---
 
@@ -112,14 +112,13 @@ Initial state:
 
 ## Current Status
 
-Wazuh SIEM infrastructure successfully deployed and operational.
+Wazuh SIEM infrastructure is successfully deployed and operational, and the first Windows endpoint is onboarded and reporting.
 
 Next Phase:
 
-- Deploy Windows endpoint VM
-- Install Wazuh agent
-- Validate Windows Event Log ingestion
-- Begin detection engineering
+- Generate security-relevant Windows events
+- Build first detections
+- Document incident-style findings
 
 ---
 
@@ -131,3 +130,60 @@ Next Phase:
 - TLS dashboard configuration
 - Virtualization best practices
 - Troubleshooting OS compatibility issues
+- Windows endpoint onboarding
+- Agent registration and connectivity validation
+- Initial Windows event ingestion into Wazuh
+
+---
+
+## Phase 2 - Windows Endpoint Onboarding
+
+### Objective
+
+The goal of Phase 2 was to create a Windows endpoint VM, connect it to the same VMware network as the Wazuh server, install the Wazuh Windows agent, verify that the endpoint appeared in the dashboard, and confirm that Windows event data was being ingested successfully.
+
+### Environment
+
+- **Endpoint OS:** Windows 11
+- **VM Name:** Windows-11-Lab
+- **Network:** NAT / VMnet8
+- **Windows IP:** `192.168.152.129`
+- **Wazuh Server IP:** `192.168.152.128`
+
+### Work Completed
+
+- Created a Windows 11 VM in VMware
+- Configured the VM with 64 GB disk, 4 GB RAM, and 2 CPU cores
+- Set the network adapter to NAT / VMnet8
+- Verified Windows-to-Wazuh connectivity using `ping`
+- Opened the Wazuh dashboard from the Windows VM
+- Used the Wazuh `Deploy new agent` workflow for Windows
+- Installed the Wazuh Windows agent
+- Started the Wazuh service successfully
+- Confirmed the endpoint appeared as active in the Wazuh dashboard
+- Confirmed Windows events were arriving in the Threat Hunting `Events` view
+
+### Commands Used
+
+#### Windows network validation
+
+```bat
+ipconfig
+ping 192.168.152.128
+```
+
+#### Agent installation and startup
+
+The Windows agent installer command was generated from the Wazuh dashboard's `Deploy new agent` workflow using the lab server IP, default group, and agent name `Windows-11-Lab`.
+
+```powershell
+NET START Wazuh
+```
+
+### Validation Results
+
+- Agent `001` registered as `Windows-11-Lab`
+- Agent status showed as `active` in the Wazuh dashboard
+- The endpoint appeared under the `default` group with OS `Microsoft Windows 11 Enterprise`
+- The first Windows events were visible in Threat Hunting with the agent filter applied
+- Initial event ingestion was confirmed on April 22, 2026

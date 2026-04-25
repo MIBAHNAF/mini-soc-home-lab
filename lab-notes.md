@@ -172,6 +172,12 @@ Same methodology each time:
 5. Write the detection report.
 6. Write an incident report when the activity tells a bigger story.
 
+Credential note:
+
+- I do not store test passwords in this repo.
+- When a command needs to show a password value, I use `<test-password>` instead.
+- Screenshots and reports should prove the activity without exposing credentials.
+
 ## Detection 1 - Failed Login Attempts
 
 What I tested:
@@ -243,6 +249,13 @@ What I tested:
 - Confirmed the account existed locally.
 - Confirmed Wazuh showed the account-related events.
 
+Commands used:
+
+```powershell
+net user soc_test_user <test-password> /add
+net user soc_test_user
+```
+
 Validated events:
 
 - Windows Event ID `4720`
@@ -273,6 +286,13 @@ What I tested:
 - Added `soc_test_user` to the local Administrators group.
 - Confirmed membership locally.
 - Confirmed Wazuh raised the higher-severity administrator group change alert.
+
+Commands used:
+
+```powershell
+net localgroup Administrators soc_test_user /add
+net localgroup Administrators
+```
 
 Validated events:
 

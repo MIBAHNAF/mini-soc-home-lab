@@ -2,27 +2,33 @@
 
 ## Overview
 
-This project simulates a small-scale Security Operations Center (SOC) environment using Wazuh SIEM. The goal is to centralize log collection, validate detection capabilities, and document incident response workflows in a controlled virtual lab.
+This project is a small Security Operations Center (SOC) lab built with Wazuh. I built it to practice the full workflow: deploy a SIEM, onboard a Windows endpoint, generate security activity, validate detections, capture evidence, and write incident-style reports.
 
-Phase 1 focused on deploying the SIEM infrastructure, validating service health, confirming open communication ports, and restoring dashboard access after a routing issue. Phase 2 extended the lab by onboarding a Windows 11 endpoint, validating agent connectivity, and confirming that Windows event data was successfully reaching the Wazuh dashboard. Phase 3 is focused on generating security-relevant Windows activity, writing detection reports, and documenting incident-style findings.
+This README is the broad project overview. For the detailed build steps, exact commands, troubleshooting notes, and working journal, see [`lab-notes.md`](lab-notes.md).
 
----
+## Why I Built This
+
+I wanted hands-on practice with real security operations work, not just theory. This lab lets me test Windows telemetry, Wazuh rules, detection logic, and incident documentation in a controlled environment.
+
+The goal is not just to make alerts fire. The goal is to prove the full chain:
+
+```text
+Windows activity -> Windows Event Log -> Wazuh agent -> Wazuh dashboard -> detection report -> incident report
+```
 
 ## Lab Environment
 
-- **Hypervisor:** VMware
-- **SIEM Platform:** Wazuh 4.7.x
-- **Server OS:** Ubuntu 24.04 LTS
-- **Network Mode:** NAT (VMnet8)
-- **Server IP:** `192.168.152.128`
-
-### Wazuh Server VM Configuration
-
-- 4 vCPUs
-- 4.9 GB RAM
-- 20 GB disk
-
----
+| Component | Details |
+|---|---|
+| Hypervisor | VMware |
+| SIEM | Wazuh |
+| Server OS | Ubuntu 24.04 LTS |
+| Endpoint OS | Windows 11 |
+| Network | NAT / VMnet8 |
+| Wazuh server IP | `192.168.152.128` |
+| Windows endpoint IP | `192.168.152.129` |
+| Windows agent name | `Windows-11-Lab` |
+| Windows agent ID | `001` |
 
 ## Repository Structure
 
@@ -36,204 +42,111 @@ mini-soc-home-lab/
 `-- README.md
 ```
 
----
+## Architecture
 
-## Phase 1 - Wazuh SIEM Deployment
+Architecture docs:
 
-### 1. System Preparation
+- [`architecture/README.md`](architecture/README.md)
+- [`architecture/network-and-data-flow.md`](architecture/network-and-data-flow.md)
 
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install curl unzip net-tools -y
-```
-
----
-
-### 2. Wazuh Installation
-
-```bash
-curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh
-sudo bash wazuh-install.sh -a -i
-```
-
-Note:
-Ubuntu 24.04 was not officially listed in the installer's supported OS check. The `-i` flag was used to bypass OS validation in this lab environment.
-
----
-
-### 3. Service Verification
-
-Verified that core services were active:
-
-```bash
-sudo systemctl status wazuh-manager
-sudo systemctl status wazuh-indexer
-sudo systemctl status wazuh-dashboard
-```
-
-All services confirmed running.
-
----
-
-### 4. Port Validation
-
-Confirmed listening ports:
-
-- 1514 - Agent log ingestion
-- 1515 - Agent registration
-- 55000 - Wazuh API
-- 443 - Wazuh Dashboard
-
-Verified using:
-
-```bash
-sudo netstat -tulnp | grep -E "1514|1515|55000|443"
-```
-
----
-
-### 5. Dashboard Access
-
-Dashboard accessed via:
+High-level flow:
 
 ```text
-https://192.168.152.128
+Windows endpoint
+    -> Wazuh agent
+    -> Wazuh manager / indexer
+    -> Wazuh dashboard
+    -> Detection and incident documentation
 ```
 
-Successfully authenticated using generated admin credentials.
+Key Wazuh ports:
 
-Initial state:
+| Port | Purpose |
+|---|---|
+| `1514` | Agent event ingestion |
+| `1515` | Agent registration |
+| `55000` | Wazuh API |
+| `443` | Wazuh dashboard |
 
-- Total agents: 0
-- Active agents: 0
-- Disconnected agents: 0
+## Phase Summary
 
----
+| Phase | Status | Summary |
+|---|---|---|
+| Phase 1 | Complete | Deployed Wazuh, validated services, confirmed ports, and recovered dashboard access after a network path issue. |
+| Phase 2 | Complete | Built and onboarded the Windows 11 endpoint, confirmed active agent status, and validated first Windows event ingestion. |
+| Phase 3 | In progress | Generating Windows security activity, writing detection reports, and documenting incident-style findings. |
+
+## Detection Progress
+
+Phase 3 progress: 4 of 8 planned detections complete.
+
+| # | Detection | Status | Report |
+|---|---|---|---|
+| 1 | Windows failed login attempts | Complete | [`windows-failed-logins.md`](detections/windows-failed-logins.md) |
+| 2 | Windows successful login after failed attempts | Complete | [`windows-success-after-failed-logins.md`](detections/windows-success-after-failed-logins.md) |
+| 3 | Windows local user created | Complete | [`windows-local-user-created.md`](detections/windows-local-user-created.md) |
+| 4 | Windows local administrator group change | Complete | [`windows-local-admin-group-change.md`](detections/windows-local-admin-group-change.md) |
+| 5 | Planned detection | Not started | Pending |
+| 6 | Planned detection | Not started | Pending |
+| 7 | Planned detection | Not started | Pending |
+| 8 | Planned detection | Not started | Pending |
+
+## Incident Reports
+
+| # | Incident Report | Status |
+|---|---|---|
+| 001 | [`Failed Logins Followed by Successful Local Logon`](incident-reports/incident-001-windows-failed-logins.md) | Closed - lab validation successful |
+| 002 | [`Local Account Creation and Administrator Group Change`](incident-reports/incident-002-local-account-admin-change.md) | Closed - lab validation successful |
+
+## Evidence Index
+
+Evidence is stored in the `screenshots/` directory and linked directly from each detection or incident report.
+
+Key evidence groups:
+
+- Phase 1 Wazuh deployment: `screenshots/01-*` through `screenshots/07-*`
+- Phase 2 Windows onboarding: `screenshots/08-*` through `screenshots/13-*`
+- Failed login detection: `screenshots/14*` and `screenshots/15-*`
+- Successful login after failures: `screenshots/16-*` and `screenshots/17-*`
+- Local user creation: `screenshots/18*` and `screenshots/19-*`
+- Local administrator group change: `screenshots/20*` and `screenshots/21-*`
+
+Exported Wazuh reports are stored in:
+
+```text
+incident-reports/evidence/
+```
+
+## Time Zone Note
+
+During Phase 3 testing, the Windows VM and Wazuh dashboard displayed timestamps in different formats and time zones. I validated events using event sequence, endpoint name, agent ID, event descriptions, Windows Event IDs, and Wazuh rule IDs.
+
+This kept validation clean even when timestamps did not visually match one-to-one.
+
+## Skills Demonstrated
+
+- SIEM deployment and validation
+- Wazuh manager, indexer, dashboard, and agent workflow
+- Linux service and port validation
+- Windows endpoint onboarding
+- Windows Event Log analysis
+- Detection engineering
+- Authentication and account-management monitoring
+- Evidence collection
+- Incident-style reporting
+- Troubleshooting across network, endpoint, and SIEM layers
+
+## Resume Summary
+
+Built a Mini-SOC home lab using Wazuh, Ubuntu, VMware, and a Windows 11 endpoint. Deployed and validated SIEM infrastructure, onboarded a Windows agent, generated controlled security events, created detection reports, and wrote SOC-style incident reports for failed logins, successful logon after failures, local user creation, and administrator group changes.
 
 ## Current Status
 
-Wazuh SIEM infrastructure is successfully deployed and operational, and the first Windows endpoint is onboarded and reporting. Phase 3 detection engineering is in progress, with 4 of 8 planned detections completed so far.
+Phase 1 and Phase 2 are complete. Phase 3 is in progress with 4 of 8 planned detections complete.
 
-Current Phase 3 progress:
+Next work:
 
-- Windows failed login attempts: complete
-- Windows successful login after failed attempts: complete
-- Windows local user created: complete
-- Windows local administrator group change: complete
-- Remaining planned detections: 4
-
----
-
-## What This Demonstrates
-
-- Enterprise SIEM deployment
-- Linux service management
-- Network port verification
-- TLS dashboard configuration
-- Virtualization best practices
-- Troubleshooting OS compatibility issues
-- Windows endpoint onboarding
-- Agent registration and connectivity validation
-- Initial Windows event ingestion into Wazuh
-- Security event generation and detection validation
-- Incident-style reporting workflow
-
----
-
-## Phase 2 - Windows Endpoint Onboarding
-
-### Objective
-
-The goal of Phase 2 was to create a Windows endpoint VM, connect it to the same VMware network as the Wazuh server, install the Wazuh Windows agent, verify that the endpoint appeared in the dashboard, and confirm that Windows event data was being ingested successfully.
-
-### Environment
-
-- **Endpoint OS:** Windows 11
-- **VM Name:** Windows-11-Lab
-- **Network:** NAT / VMnet8
-- **Windows IP:** `192.168.152.129`
-- **Wazuh Server IP:** `192.168.152.128`
-
-### Work Completed
-
-- Created a Windows 11 VM in VMware
-- Configured the VM with 64 GB disk, 4 GB RAM, and 2 CPU cores
-- Set the network adapter to NAT / VMnet8
-- Verified Windows-to-Wazuh connectivity using `ping`
-- Opened the Wazuh dashboard from the Windows VM
-- Used the Wazuh `Deploy new agent` workflow for Windows
-- Installed the Wazuh Windows agent
-- Started the Wazuh service successfully
-- Confirmed the endpoint appeared as active in the Wazuh dashboard
-- Confirmed Windows events were arriving in the Threat Hunting `Events` view
-
-### Commands Used
-
-#### Windows network validation
-
-```bat
-ipconfig
-ping 192.168.152.128
-```
-
-#### Agent installation and startup
-
-The Windows agent installer command was generated from the Wazuh dashboard's `Deploy new agent` workflow using the lab server IP, default group, and agent name `Windows-11-Lab`.
-
-```powershell
-NET START Wazuh
-```
-
-### Validation Results
-
-- Agent `001` registered as `Windows-11-Lab`
-- Agent status showed as `active` in the Wazuh dashboard
-- The endpoint appeared under the `default` group with OS `Microsoft Windows 11 Enterprise`
-- The first Windows events were visible in Threat Hunting with the agent filter applied
-- Initial event ingestion was confirmed on April 22, 2026
-
----
-
-## Phase 3 - Detection Engineering and Incident Documentation
-
-### Objective
-
-The goal of Phase 3 is to generate controlled security-relevant Windows activity, validate that Wazuh ingests and displays the events, write detection reports, and document incident-style findings from the observed activity.
-
-### Progress
-
-Phase 3 is partially complete. Four of eight planned detections have been created so far.
-
-Completed detections:
-
-- `detections/windows-failed-logins.md`
-- `detections/windows-success-after-failed-logins.md`
-- `detections/windows-local-user-created.md`
-- `detections/windows-local-admin-group-change.md`
-
-Incident reports started:
-
-- `incident-reports/incident-001-windows-failed-logins.md`
-- `incident-reports/incident-002-local-account-admin-change.md`
-
-Remaining work:
-
-- Complete the remaining four planned detections.
-- Continue capturing screenshots and exported evidence.
-- Add incident-style writeups for notable detection tests.
-- Refine detection thresholds and analyst notes as more telemetry is generated.
-
-### Time Zone Note
-
-During Phase 3 testing, the Windows VM and the Wazuh dashboard displayed timestamps in different formats and time zones. Because of this, some Windows Event Viewer timestamps may not visually match Wazuh timestamps one-to-one.
-
-For validation, events were correlated using:
-
-- Event sequence
-- Endpoint name: `Windows-11-Lab`
-- Agent ID: `001`
-- Event or rule description
-- Windows Event IDs
-- Wazuh rule IDs
-
-This prevented timestamp display differences from affecting detection validation.
+- Complete the remaining four detections.
+- Continue capturing screenshots and Wazuh evidence.
+- Add incident reports when the activity tells a useful investigation story.
+- Keep refining detections with better thresholds and context.

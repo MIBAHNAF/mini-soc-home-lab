@@ -24,14 +24,7 @@ This detection identifies local account creation activity on a monitored Windows
 
 ## Detection Logic
 
-Trigger an investigation when Windows account-management events show local user creation or related account changes on an endpoint.
-
-Observed sequence:
-
-- Local user account `soc_test_user` was created.
-- Windows Event Viewer recorded Event ID `4720`.
-- Wazuh displayed account-related events from `Windows-11-Lab`.
-- Related Wazuh rules included `60109`, `60110`, and `60170`.
+Trigger when Windows account-management events show local user creation or related account changes on an endpoint.
 
 Suggested Wazuh dashboard filter:
 
@@ -39,7 +32,14 @@ Suggested Wazuh dashboard filter:
 agent.id: 001 AND (rule.id: 60109 OR rule.id: 60110 OR rule.id: 60170)
 ```
 
-For production detection engineering, this activity should be correlated with the creator account, command-line telemetry, group membership changes, and whether the account was later used to authenticate.
+Detection fields:
+
+- Created username
+- Creator account
+- Endpoint name
+- Agent ID
+- Group membership changes
+- Related account-change events
 
 ## Test Method
 
@@ -48,15 +48,13 @@ A test local user account was created on the Windows endpoint using an Administr
 ## Commands Used
 
 ```powershell
-net user soc_test_user P@ssw0rd123! /add
+net user soc_test_user <test-password> /add
 net user soc_test_user
 ```
 
-The second command confirmed that the account existed, was active, and belonged to the local `Users` group.
+The password value is intentionally omitted from the report. The second command confirmed that the account existed, was active, and belonged to the local `Users` group.
 
 ## Validation
-
-The local user creation was validated in Windows and then confirmed in Wazuh Threat Hunting.
 
 Windows validation:
 
@@ -84,18 +82,12 @@ Wazuh validation:
 
 Wazuh successfully ingested and displayed Windows local account creation activity from the endpoint. The Windows local validation and Wazuh event data confirmed that account-management telemetry is flowing from the Windows endpoint into the SIEM.
 
-## Analyst Notes
+## Detection Considerations
 
-In a production environment, unexpected local user creation may indicate persistence, unauthorized administrative activity, or preparation for later access. This event should be reviewed alongside the creator account, endpoint context, timestamp, command-line activity, and any related privilege or group membership changes.
-
-Follow-up investigation should include:
-
-- Account that created the new user
-- Name and status of the created account
-- Whether the account was added to privileged groups
-- Whether the account was used to log in later
-- Whether the creation occurred during normal administrative activity
-- Whether similar accounts were created on other endpoints
+- Local user creation can be legitimate administrative activity.
+- Unexpected account creation can indicate persistence or unauthorized administrative access.
+- Confidence improves when user creation is correlated with group membership changes, command-line activity, and later successful logons.
+- Newly created accounts should be reviewed for privilege level and subsequent activity.
 
 ## Recommendation
 

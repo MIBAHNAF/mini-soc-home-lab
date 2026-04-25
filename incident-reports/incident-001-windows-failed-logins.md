@@ -1,10 +1,10 @@
-# Incident Report 001: Windows Failed Login Attempts
+# Incident Report 001: Failed Logins Followed by Successful Local Logon
 
 ## 1. Executive Summary
 
-On April 25, 2026, multiple failed login attempts were detected on the Windows endpoint `Windows-11-Lab` in the Mini-SOC Home Lab. This activity was generated intentionally in a controlled lab environment to validate Windows authentication monitoring through Wazuh SIEM.
+On April 25, 2026, the analyst observed multiple failed login attempts on the Windows endpoint `Windows-11-Lab`, followed shortly afterward by successful local logon-related activity from the same endpoint. This activity was generated intentionally in a controlled lab environment to validate Windows authentication monitoring through Wazuh SIEM.
 
-Wazuh successfully ingested the Windows failed logon events from the endpoint and generated authentication failure alerts. The activity was confirmed in both Windows Event Viewer and the Wazuh Threat Hunting interface.
+The case was confirmed using Windows Event Viewer and Wazuh Threat Hunting. Wazuh showed four failed authentication events using rule ID `60122`, followed by local logon-related events using rule IDs `67022` and `67028`.
 
 This incident was classified as a lab validation event, not a real compromise.
 
@@ -25,7 +25,7 @@ This incident was classified as a lab validation event, not a real compromise.
 
 ---
 
-## 3. Detection Source
+## 3. Alert and Detection Source
 
 The activity was detected through Windows authentication logs collected by the Wazuh agent and displayed in Wazuh Threat Hunting.
 
@@ -33,12 +33,13 @@ Relevant detection details:
 
 | Field | Value |
 |---|---|
-| Windows Event ID | 4625 |
-| Wazuh Rule ID | 60122 |
-| Rule Description | Logon Failure - Unknown user or bad password |
-| Rule Level | 5 |
-| Alert Count | 4 |
-| Rule Groups | authentication_failed, windows, windows_security |
+| Failed Logon Event ID | 4625 |
+| Successful Logon Event ID | 4624 |
+| Failed Logon Wazuh Rule ID | 60122 |
+| Local Logon Wazuh Rule ID | 67022 |
+| Special Privileges Wazuh Rule ID | 67028 |
+| Failed Logon Rule Description | Logon Failure - Unknown user or bad password |
+| Alert Count for Failed Logons | 4 |
 
 ---
 
@@ -46,33 +47,64 @@ Relevant detection details:
 
 | Time | Event |
 |---|---|
-| 16:14:37 | Failed login attempt recorded in Wazuh |
-| 16:14:40 | Failed login attempt recorded in Wazuh |
-| 16:14:42 | Failed login attempt recorded in Wazuh |
-| 16:14:44 | Failed login attempt recorded in Wazuh |
-| After failed attempts | User authenticated normally after controlled test |
+| 16:14:37 | Failed login attempt recorded in Wazuh with rule ID `60122` |
+| 16:14:40 | Failed login attempt recorded in Wazuh with rule ID `60122` |
+| 16:14:42 | Failed login attempt recorded in Wazuh with rule ID `60122` |
+| 16:14:44 | Failed login attempt recorded in Wazuh with rule ID `60122` |
+| Around 16:15:30 | Local logon-related events recorded in Wazuh with rule IDs `67022` and `67028` |
+| After failed attempts | User authenticated normally after the controlled test |
 
-Windows Event Viewer also showed four matching Event ID `4625` entries around `1:14 PM` local Windows time.
+Timestamp note:
+
+Windows Event Viewer and Wazuh displayed timestamps differently during testing. The analyst correlated the activity using event sequence, endpoint name, agent ID, rule descriptions, Windows Event IDs, and Wazuh rule IDs.
 
 ---
 
 ## 5. What Happened
 
-The Windows endpoint was locked, and several incorrect PIN or password attempts were entered to simulate repeated failed authentication attempts. This caused Windows to generate failed logon events under Event ID `4625`.
+The Windows endpoint was locked, and several incorrect PIN or password attempts were entered to simulate repeated failed authentication attempts. Windows generated failed logon events under Event ID `4625`.
 
-The Wazuh agent installed on `Windows-11-Lab` forwarded these Windows security events to the Wazuh manager. In the Wazuh dashboard, the events appeared under Threat Hunting with the rule description `Logon Failure - Unknown user or bad password`.
+After the failed attempts, the correct credentials were used to log back into the endpoint. Windows Event Viewer showed successful logon activity under Event ID `4624`. Wazuh then showed local logon-related activity from the same endpoint, including `Non network or service local logon` and `Special privileges assigned to new logon`.
 
-The Wazuh dashboard showed four authentication failure alerts for the Windows endpoint. The Wazuh-generated report also confirmed the endpoint information, including agent ID `001`, endpoint name `Windows-11-Lab`, IP address `192.168.152.129`, and Windows 11 operating system details. The report summary listed rule ID `60122`, rule level `5`, and alert count `4` for the failed logon activity.
+The analyst treated the sequence as one investigation because the successful local logon happened shortly after the failed authentication activity on the same endpoint.
 
 ---
 
-## 6. Evidence
+## 6. Analyst Observations
+
+- Four failed logon events were visible in Wazuh for `Windows-11-Lab`.
+- The failed logon events used Wazuh rule ID `60122`.
+- Windows Event Viewer confirmed matching failed logon activity with Event ID `4625`.
+- Windows Event Viewer confirmed successful logon activity with Event ID `4624`.
+- Wazuh showed local logon-related events shortly after the failed attempts.
+- Wazuh displayed rule ID `67022` for local logon activity.
+- Wazuh displayed rule ID `67028` for special privileges assigned to the new logon.
+- The activity was expected because it was generated intentionally for lab validation.
+
+---
+
+## 7. Actions Taken
+
+1. Generated controlled failed login attempts on the Windows endpoint.
+2. Logged in successfully after the failed attempts.
+3. Confirmed failed logon events locally in Windows Event Viewer.
+4. Confirmed successful logon activity locally in Windows Event Viewer.
+5. Confirmed Wazuh received the failed authentication events.
+6. Confirmed Wazuh displayed local logon-related events after the failures.
+7. Captured screenshots and exported Wazuh evidence.
+8. Documented the detection and incident workflow.
+
+---
+
+## 8. Evidence Reviewed
 
 ### Screenshots
 
 - `../screenshots/14a-windows-audit-policy-logon.png`
 - `../screenshots/14b-windows-failed-login-attempts.png`
 - `../screenshots/15-wazuh-failed-login-events.png`
+- `../screenshots/16-windows-success-after-failures.png`
+- `../screenshots/17-wazuh-success-after-failures.png`
 
 ### Wazuh Report
 
@@ -80,64 +112,38 @@ The Wazuh dashboard showed four authentication failure alerts for the Windows en
 
 ---
 
-## 7. Analysis
+## 9. Impact
 
-The failed login attempts were successfully detected and correlated to the Windows endpoint. In a real SOC environment, this pattern could represent several possibilities:
-
-- A user mistyping their password or PIN
-- A brute-force attempt against a local account
-- Password spraying activity
-- Unauthorized access attempts
-- Reconnaissance against a valid user account
-
-Because the activity occurred in a lab environment and was intentionally generated, there was no real security impact. However, the test confirms that the Wazuh pipeline can collect and display authentication failure events from a Windows endpoint.
-
-The most important validation point is that the activity was visible in both the local Windows logs and the centralized SIEM dashboard. This confirms that endpoint telemetry is flowing correctly from Windows to Wazuh.
-
----
-
-## 8. Impact
-
-This was a controlled test with no real unauthorized access.
+This was a controlled lab test with no real unauthorized access.
 
 Potential production impact of similar activity could include:
 
 - Account lockout
-- Unauthorized access if followed by a successful login
-- Credential guessing against local or domain accounts
-- Early-stage brute-force or password spraying activity
+- Successful unauthorized access after credential guessing
+- Brute-force attempts against local or domain accounts
+- Password spraying activity
+- Privileged session creation after a successful login
 
 ---
 
-## 9. Recommendations
+## 10. Recommended Next Steps
 
 For a production environment, the following actions would be recommended:
 
-1. Monitor repeated failed login attempts by username, endpoint, and source address.
-2. Alert when failed login attempts exceed a defined threshold within a short time window.
-3. Investigate whether a successful login occurs shortly after repeated failures.
-4. Enforce account lockout policies.
-5. Require MFA where possible.
-6. Review authentication attempts outside normal business hours.
-7. Correlate failed logins with endpoint, VPN, and identity provider logs.
-8. Tune SIEM rules to reduce false positives from normal user mistakes while still detecting suspicious patterns.
+1. Identify the username involved in the failed and successful logons.
+2. Review the source address or workstation name.
+3. Confirm whether the successful logon was expected.
+4. Review logon type and privilege assignment.
+5. Check whether additional failures occurred against the same account or endpoint.
+6. Alert when successful login follows repeated failures within a short time window.
+7. Enforce account lockout policies where appropriate.
+8. Require MFA where possible.
+9. Correlate endpoint, VPN, and identity provider logs.
 
 ---
 
-## 10. Status
+## 11. Final Determination
 
 Closed - Lab validation successful.
 
----
-
-## 11. Analyst Notes
-
-This incident confirmed that the Windows endpoint was properly onboarded into Wazuh and that authentication failure events were being ingested into the SIEM. The test also created a baseline workflow for future detection validation:
-
-1. Generate controlled activity on the endpoint.
-2. Confirm the event locally in Windows Event Viewer.
-3. Confirm centralized ingestion in Wazuh.
-4. Capture screenshots and exported reports.
-5. Write a short analyst-style incident report.
-
-This workflow will be reused for future detections involving successful login after failures, local user creation, privilege changes, and PowerShell activity.
+The analyst determined that the activity was expected and intentionally generated. The case confirmed that Wazuh can ingest and display failed Windows authentication events, successful local logon-related events, and special privilege assignment events from the onboarded Windows endpoint.

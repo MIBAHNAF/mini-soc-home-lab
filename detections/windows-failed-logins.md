@@ -2,7 +2,7 @@
 
 ## Objective
 
-Detect failed Windows login attempts from the Windows endpoint using Windows Security logs ingested by Wazuh.
+Detect failed Windows login attempts from the Windows endpoint and confirm that Wazuh ingests the events correctly.
 
 ## Endpoint
 
@@ -11,9 +11,15 @@ Detect failed Windows login attempts from the Windows endpoint using Windows Sec
 - IP address: `192.168.152.129`
 - Platform: Windows 11
 
-## Detection Summary
+## What This Detects
 
-This detection identifies failed Windows logon attempts. In this lab, repeated incorrect PIN or password attempts generated Windows Event ID `4625`, and Wazuh displayed the activity as authentication failure events using rule ID `60122`.
+This detection looks for failed Windows logons. I tested it by entering the wrong PIN or password several times on the Windows VM.
+
+The important signal is simple:
+
+- Windows generated Event ID `4625`.
+- Wazuh received the events from `Windows-11-Lab`.
+- Wazuh mapped the activity to rule ID `60122`.
 
 ## Relevant Events
 
@@ -24,7 +30,7 @@ This detection identifies failed Windows logon attempts. In this lab, repeated i
 
 ## Detection Logic
 
-Trigger when Windows Security logs show failed authentication activity from the monitored Windows endpoint.
+Start simple: look for failed authentication events from the Windows endpoint.
 
 Suggested Wazuh dashboard filter:
 
@@ -32,7 +38,7 @@ Suggested Wazuh dashboard filter:
 agent.id: 001 AND rule.id: 60122
 ```
 
-Detection fields:
+Fields I used to validate the detection:
 
 - `agent.name: Windows-11-Lab`
 - `agent.id: 001`
@@ -41,15 +47,15 @@ Detection fields:
 
 ## Test Method
 
-The Windows endpoint was locked, and multiple incorrect PIN or password attempts were entered. After several failed attempts, the correct credentials were used to log back into the system.
+I locked the Windows endpoint and entered the wrong PIN or password multiple times. After the failed attempts, I logged in with the correct credentials.
 
-Audit policy was checked before validation to confirm that logon auditing was enabled.
+Before validating the detection, I checked the audit policy:
 
 ```powershell
 auditpol /get /category:"Logon/Logoff"
 ```
 
-The observed audit policy showed `Logon` configured for `Success and Failure`, allowing failed login attempts to appear in the Windows Security log.
+The `Logon` setting showed `Success and Failure`, so Windows was configured to record failed logon activity.
 
 ## Validation
 
@@ -76,20 +82,20 @@ Wazuh Dashboard:
 
 ## Result
 
-Wazuh successfully ingested and displayed failed Windows login attempts from the Windows endpoint. The Windows Event Viewer evidence and Wazuh dashboard evidence matched the same test activity, confirming end-to-end visibility from endpoint event generation to SIEM display.
+Wazuh ingested and displayed the failed Windows login attempts. The same activity showed up locally in Windows Event Viewer and centrally in Wazuh, so the pipeline worked end to end.
 
 ## Detection Considerations
 
-- Failed logons can be benign when caused by normal user mistakes.
-- Repeated failures in a short time window increase suspicion.
-- Confidence improves when failures are correlated with username, source address, endpoint, and later successful logons.
-- This detection can be noisy if alerting on every single failed attempt.
+- One failed login can be normal user error.
+- Multiple failures in a short window are more useful.
+- This detection gets stronger when it is tied to username, source address, endpoint, and any later successful login.
+- Alerting on every failed attempt would create noise.
 
 ## Recommendation
 
 - Monitor repeated failed login attempts by user and source host.
-- Alert when failed attempts exceed a defined threshold.
-- Correlate failed logons with successful logons that occur shortly afterward.
-- Enforce account lockout policy where appropriate.
-- Use MFA for accounts with remote access or administrative privileges.
-- Tune thresholds to reduce noise from normal user mistakes while preserving brute-force visibility.
+- Alert when failed attempts cross a clear threshold.
+- Correlate failed logons with successful logons that happen shortly afterward.
+- Enforce account lockout policy where it makes sense.
+- Use MFA for remote access and privileged accounts.
+- Tune the threshold so normal mistakes do not drown out real credential attacks.

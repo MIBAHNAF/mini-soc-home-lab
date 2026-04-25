@@ -2,11 +2,11 @@
 
 ## 1. Executive Summary
 
-On April 25, 2026, the analyst observed multiple failed login attempts on the Windows endpoint `Windows-11-Lab`, followed shortly afterward by successful local logon-related activity from the same endpoint. This activity was generated intentionally in a controlled lab environment to validate Windows authentication monitoring through Wazuh SIEM.
+On April 25, 2026, I observed four failed login attempts on `Windows-11-Lab`, followed shortly after by successful local logon-related activity from the same endpoint.
 
-The case was confirmed using Windows Event Viewer and Wazuh Threat Hunting. Wazuh showed four failed authentication events using rule ID `60122`, followed by local logon-related events using rule IDs `67022` and `67028`.
+This was a controlled lab test. The goal was to validate that Wazuh could show both sides of the authentication story: the failed attempts and the later successful logon activity.
 
-This incident was classified as a lab validation event, not a real compromise.
+Final call: lab validation successful. No real compromise.
 
 ---
 
@@ -27,9 +27,9 @@ This incident was classified as a lab validation event, not a real compromise.
 
 ## 3. Alert and Detection Source
 
-The activity was detected through Windows authentication logs collected by the Wazuh agent and displayed in Wazuh Threat Hunting.
+Wazuh received Windows authentication logs from the Wazuh agent installed on `Windows-11-Lab`.
 
-Relevant detection details:
+Key detection details:
 
 | Field | Value |
 |---|---|
@@ -39,7 +39,7 @@ Relevant detection details:
 | Local Logon Wazuh Rule ID | 67022 |
 | Special Privileges Wazuh Rule ID | 67028 |
 | Failed Logon Rule Description | Logon Failure - Unknown user or bad password |
-| Alert Count for Failed Logons | 4 |
+| Failed Logon Count | 4 |
 
 ---
 
@@ -52,45 +52,48 @@ Relevant detection details:
 | 16:14:42 | Failed login attempt recorded in Wazuh with rule ID `60122` |
 | 16:14:44 | Failed login attempt recorded in Wazuh with rule ID `60122` |
 | Around 16:15:30 | Local logon-related events recorded in Wazuh with rule IDs `67022` and `67028` |
-| After failed attempts | User authenticated normally after the controlled test |
+| After failed attempts | User logged in normally after the controlled test |
 
 Timestamp note:
 
-Windows Event Viewer and Wazuh displayed timestamps differently during testing. The analyst correlated the activity using event sequence, endpoint name, agent ID, rule descriptions, Windows Event IDs, and Wazuh rule IDs.
+Windows Event Viewer and Wazuh displayed timestamps differently during testing. I did not rely on the clock display alone. I correlated the events by sequence, endpoint name, agent ID, rule description, Windows Event ID, and Wazuh rule ID.
 
 ---
 
 ## 5. What Happened
 
-The Windows endpoint was locked, and several incorrect PIN or password attempts were entered to simulate repeated failed authentication attempts. Windows generated failed logon events under Event ID `4625`.
+I locked the Windows endpoint and entered the wrong PIN or password several times. Windows generated failed logon events under Event ID `4625`.
 
-After the failed attempts, the correct credentials were used to log back into the endpoint. Windows Event Viewer showed successful logon activity under Event ID `4624`. Wazuh then showed local logon-related activity from the same endpoint, including `Non network or service local logon` and `Special privileges assigned to new logon`.
+After that, I logged in with the correct credentials. Windows Event Viewer showed successful logon activity under Event ID `4624`. Wazuh showed related local logon events from the same endpoint, including:
 
-The analyst treated the sequence as one investigation because the successful local logon happened shortly after the failed authentication activity on the same endpoint.
+- `Non network or service local logon`
+- `Special privileges assigned to new logon`
+
+I treated this as one incident because the successful logon happened right after the failed attempts on the same machine.
 
 ---
 
-## 6. Analyst Observations
+## 6. What I Observed
 
-- Four failed logon events were visible in Wazuh for `Windows-11-Lab`.
+- Wazuh showed four failed logon events for `Windows-11-Lab`.
 - The failed logon events used Wazuh rule ID `60122`.
-- Windows Event Viewer confirmed matching failed logon activity with Event ID `4625`.
+- Windows Event Viewer confirmed failed logons with Event ID `4625`.
 - Windows Event Viewer confirmed successful logon activity with Event ID `4624`.
-- Wazuh showed local logon-related events shortly after the failed attempts.
-- Wazuh displayed rule ID `67022` for local logon activity.
-- Wazuh displayed rule ID `67028` for special privileges assigned to the new logon.
-- The activity was expected because it was generated intentionally for lab validation.
+- Wazuh showed local logon-related events shortly after the failures.
+- Wazuh showed rule ID `67022` for local logon activity.
+- Wazuh showed rule ID `67028` for special privileges assigned to the new logon.
+- The activity was expected because I generated it for lab validation.
 
 ---
 
-## 7. Actions Taken
+## 7. What I Did
 
 1. Generated controlled failed login attempts on the Windows endpoint.
 2. Logged in successfully after the failed attempts.
-3. Confirmed failed logon events locally in Windows Event Viewer.
-4. Confirmed successful logon activity locally in Windows Event Viewer.
-5. Confirmed Wazuh received the failed authentication events.
-6. Confirmed Wazuh displayed local logon-related events after the failures.
+3. Checked Windows Event Viewer for Event ID `4625`.
+4. Checked Windows Event Viewer for Event ID `4624`.
+5. Checked Wazuh Threat Hunting for the failed authentication events.
+6. Checked Wazuh Threat Hunting for the local logon-related events.
 7. Captured screenshots and exported Wazuh evidence.
 8. Documented the detection and incident workflow.
 
@@ -114,29 +117,30 @@ The analyst treated the sequence as one investigation because the successful loc
 
 ## 9. Impact
 
-This was a controlled lab test with no real unauthorized access.
+This was a controlled lab test. No unauthorized access occurred.
 
-Potential production impact of similar activity could include:
+In production, the same pattern would matter because it could mean:
 
-- Account lockout
-- Successful unauthorized access after credential guessing
-- Brute-force attempts against local or domain accounts
-- Password spraying activity
-- Privileged session creation after a successful login
+- A user made several mistakes and then logged in normally
+- Someone guessed a password and eventually succeeded
+- Password spraying or brute-force activity targeted the account
+- A privileged session started after suspicious authentication activity
+
+The key question would be: is it real or noise?
 
 ---
 
 ## 10. Recommended Next Steps
 
-For a production environment, the following actions would be recommended:
+If this happened in production, I would:
 
-1. Identify the username involved in the failed and successful logons.
-2. Review the source address or workstation name.
+1. Identify the username tied to the failed and successful logons.
+2. Check the source address or workstation name.
 3. Confirm whether the successful logon was expected.
-4. Review logon type and privilege assignment.
-5. Check whether additional failures occurred against the same account or endpoint.
-6. Alert when successful login follows repeated failures within a short time window.
-7. Enforce account lockout policies where appropriate.
+4. Review the logon type and privilege assignment.
+5. Check whether the same account had failures on other endpoints.
+6. Alert when a successful login follows repeated failures in a short time window.
+7. Enforce account lockout policy where appropriate.
 8. Require MFA where possible.
 9. Correlate endpoint, VPN, and identity provider logs.
 
@@ -144,6 +148,6 @@ For a production environment, the following actions would be recommended:
 
 ## 11. Final Determination
 
-Closed - Lab validation successful.
+Closed - lab validation successful.
 
-The analyst determined that the activity was expected and intentionally generated. The case confirmed that Wazuh can ingest and display failed Windows authentication events, successful local logon-related events, and special privilege assignment events from the onboarded Windows endpoint.
+This was expected activity. I confirmed that Wazuh can ingest and display failed Windows authentication events, successful local logon-related events, and special privilege assignment events from the onboarded Windows endpoint.

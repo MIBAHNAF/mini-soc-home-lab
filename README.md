@@ -112,14 +112,15 @@ Initial state:
 
 ## Current Status
 
-Wazuh SIEM infrastructure is successfully deployed and operational, and the first Windows endpoint is onboarded and reporting. Phase 3 detection engineering is in progress, with 3 of 8 planned detections completed so far.
+Wazuh SIEM infrastructure is successfully deployed and operational, and the first Windows endpoint is onboarded and reporting. Phase 3 detection engineering is in progress, with 4 of 8 planned detections completed so far.
 
 Current Phase 3 progress:
 
 - Windows failed login attempts: complete
 - Windows successful login after failed attempts: complete
 - Windows local user created: complete
-- Remaining planned detections: 5
+- Windows local administrator group change: complete
+- Remaining planned detections: 4
 
 ---
 
@@ -201,21 +202,23 @@ The goal of Phase 3 is to generate controlled security-relevant Windows activity
 
 ### Progress
 
-Phase 3 is partially complete. Three of eight planned detections have been created so far.
+Phase 3 is partially complete. Four of eight planned detections have been created so far.
 
 Completed detections:
 
 - `detections/windows-failed-logins.md`
 - `detections/windows-success-after-failed-logins.md`
 - `detections/windows-local-user-created.md`
+- `detections/windows-local-admin-group-change.md`
 
 Incident reports started:
 
 - `incident-reports/incident-001-windows-failed-logins.md`
+- `incident-reports/incident-002-local-account-admin-change.md`
 
 Remaining work:
 
-- Complete the remaining five planned detections.
+- Complete the remaining four planned detections.
 - Continue capturing screenshots and exported evidence.
 - Add incident-style writeups for notable detection tests.
 - Refine detection thresholds and analyst notes as more telemetry is generated.

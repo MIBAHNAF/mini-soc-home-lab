@@ -11,9 +11,11 @@ Detect local user account creation on the Windows endpoint using Windows Securit
 - IP address: `192.168.152.129`
 - Platform: Windows 11
 
-## Detection Summary
+## What This Detects
 
-This detection identifies local account creation activity on a monitored Windows endpoint. In this lab, a test account named `soc_test_user` was created from an Administrator PowerShell session, then validated locally in Windows and centrally in Wazuh Threat Hunting.
+This detection looks for local account creation on a Windows endpoint. In this lab, I created a test account named `soc_test_user` from an Administrator PowerShell session.
+
+This is a useful detection because unexpected local account creation can be a persistence technique. If an attacker gets access, one simple way to come back later is to create another local user.
 
 ## Relevant Events
 
@@ -32,7 +34,7 @@ Suggested Wazuh dashboard filter:
 agent.id: 001 AND (rule.id: 60109 OR rule.id: 60110 OR rule.id: 60170)
 ```
 
-Detection fields:
+Fields I would review:
 
 - Created username
 - Creator account
@@ -43,7 +45,7 @@ Detection fields:
 
 ## Test Method
 
-A test local user account was created on the Windows endpoint using an Administrator PowerShell session.
+I created a test local user account on the Windows endpoint using an Administrator PowerShell session.
 
 ## Commands Used
 
@@ -52,7 +54,7 @@ net user soc_test_user <test-password> /add
 net user soc_test_user
 ```
 
-The password value is intentionally omitted from the report. The second command confirmed that the account existed, was active, and belonged to the local `Users` group.
+I intentionally left the test password out of the report. The second command confirmed that the account existed, was active, and belonged to the local `Users` group.
 
 ## Validation
 
@@ -66,7 +68,7 @@ Windows validation:
 
 Wazuh validation:
 
-- Wazuh displayed account-related events from the `Windows-11-Lab` endpoint.
+- Wazuh displayed account-related events from `Windows-11-Lab`.
 - Wazuh showed `User account enabled or created` with rule ID `60109`.
 - Wazuh showed `User account changed` with rule ID `60110`.
 - Wazuh showed `Users Group Changed` with rule ID `60170`.
@@ -80,14 +82,14 @@ Wazuh validation:
 
 ## Result
 
-Wazuh successfully ingested and displayed Windows local account creation activity from the endpoint. The Windows local validation and Wazuh event data confirmed that account-management telemetry is flowing from the Windows endpoint into the SIEM.
+Wazuh ingested and displayed the local account creation activity from the Windows endpoint. The account existed locally, Windows logged it, and Wazuh showed the related account-management events.
 
 ## Detection Considerations
 
-- Local user creation can be legitimate administrative activity.
-- Unexpected account creation can indicate persistence or unauthorized administrative access.
-- Confidence improves when user creation is correlated with group membership changes, command-line activity, and later successful logons.
-- Newly created accounts should be reviewed for privilege level and subsequent activity.
+- Local user creation can be normal admin work.
+- Unexpected account creation is worth reviewing.
+- The detection is stronger when tied to the creator account, command-line activity, group changes, and later logons.
+- Newly created accounts should be checked for privilege level and follow-up activity.
 
 ## Recommendation
 
@@ -97,4 +99,4 @@ Wazuh successfully ingested and displayed Windows local account creation activit
 - Disable or remove unauthorized local users.
 - Correlate user creation with privilege and group membership changes.
 - Review successful logons by newly created local accounts.
-- Use least privilege and restrict local administrator rights where possible.
+- Keep local administrator rights limited.

@@ -4,7 +4,7 @@
 
 This project simulates a small-scale Security Operations Center (SOC) environment using Wazuh SIEM. The goal is to centralize log collection, validate detection capabilities, and document incident response workflows in a controlled virtual lab.
 
-Phase 1 focused on deploying the SIEM infrastructure, validating service health, confirming open communication ports, and restoring dashboard access after a routing issue. Phase 2 extended the lab by onboarding a Windows 11 endpoint, validating agent connectivity, and confirming that Windows event data was successfully reaching the Wazuh dashboard.
+Phase 1 focused on deploying the SIEM infrastructure, validating service health, confirming open communication ports, and restoring dashboard access after a routing issue. Phase 2 extended the lab by onboarding a Windows 11 endpoint, validating agent connectivity, and confirming that Windows event data was successfully reaching the Wazuh dashboard. Phase 3 is focused on generating security-relevant Windows activity, writing detection reports, and documenting incident-style findings.
 
 ---
 
@@ -112,13 +112,14 @@ Initial state:
 
 ## Current Status
 
-Wazuh SIEM infrastructure is successfully deployed and operational, and the first Windows endpoint is onboarded and reporting.
+Wazuh SIEM infrastructure is successfully deployed and operational, and the first Windows endpoint is onboarded and reporting. Phase 3 detection engineering is in progress, with 3 of 8 planned detections completed so far.
 
-Next Phase:
+Current Phase 3 progress:
 
-- Generate security-relevant Windows events
-- Build first detections
-- Document incident-style findings
+- Windows failed login attempts: complete
+- Windows successful login after failed attempts: complete
+- Windows local user created: complete
+- Remaining planned detections: 5
 
 ---
 
@@ -133,6 +134,8 @@ Next Phase:
 - Windows endpoint onboarding
 - Agent registration and connectivity validation
 - Initial Windows event ingestion into Wazuh
+- Security event generation and detection validation
+- Incident-style reporting workflow
 
 ---
 
@@ -187,3 +190,47 @@ NET START Wazuh
 - The endpoint appeared under the `default` group with OS `Microsoft Windows 11 Enterprise`
 - The first Windows events were visible in Threat Hunting with the agent filter applied
 - Initial event ingestion was confirmed on April 22, 2026
+
+---
+
+## Phase 3 - Detection Engineering and Incident Documentation
+
+### Objective
+
+The goal of Phase 3 is to generate controlled security-relevant Windows activity, validate that Wazuh ingests and displays the events, write detection reports, and document incident-style findings from the observed activity.
+
+### Progress
+
+Phase 3 is partially complete. Three of eight planned detections have been created so far.
+
+Completed detections:
+
+- `detections/windows-failed-logins.md`
+- `detections/windows-success-after-failed-logins.md`
+- `detections/windows-local-user-created.md`
+
+Incident reports started:
+
+- `incident-reports/incident-001-windows-failed-logins.md`
+
+Remaining work:
+
+- Complete the remaining five planned detections.
+- Continue capturing screenshots and exported evidence.
+- Add incident-style writeups for notable detection tests.
+- Refine detection thresholds and analyst notes as more telemetry is generated.
+
+### Time Zone Note
+
+During Phase 3 testing, the Windows VM and the Wazuh dashboard displayed timestamps in different formats and time zones. Because of this, some Windows Event Viewer timestamps may not visually match Wazuh timestamps one-to-one.
+
+For validation, events were correlated using:
+
+- Event sequence
+- Endpoint name: `Windows-11-Lab`
+- Agent ID: `001`
+- Event or rule description
+- Windows Event IDs
+- Wazuh rule IDs
+
+This prevented timestamp display differences from affecting detection validation.

@@ -11,9 +11,9 @@ Current state:
 - Wazuh server is deployed and reachable.
 - Windows endpoint `Windows-11-Lab` is onboarded and active.
 - Windows events are reaching Wazuh Threat Hunting.
-- Four of eight planned detections are complete.
+- Five of eight planned detections are complete.
 - Two incident-style reports are started.
-- Remaining Phase 3 work: four detections plus any follow-up incident reports that make sense.
+- Remaining Phase 3 work: three detections plus any follow-up incident reports that make sense.
 
 Lab systems:
 
@@ -319,6 +319,135 @@ This was treated as one incident with local account creation because the account
 
 ---
 
+## Detection 5 - PowerShell Activity
+
+What I tested:
+
+- Enabled PowerShell script block logging.
+- Confirmed PowerShell Operational events were created locally.
+- Added the PowerShell Operational channel to the Wazuh agent configuration.
+- Restarted the Wazuh agent service.
+- Generated benign PowerShell enumeration activity.
+- Confirmed Wazuh showed PowerShell-related events from `Windows-11-Lab`.
+
+Commands used:
+
+```powershell
+Get-Process | Where-Object {$_.CPU -gt 10}
+Get-LocalUser
+Get-LocalGroupMember Administrators
+```
+
+Wazuh agent configuration added:
+
+```xml
+<localfile>
+  <location>Microsoft-Windows-PowerShell/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
+```
+
+Validated events:
+
+- PowerShell Operational Log
+- Windows PowerShell Event ID `4104`
+- Wazuh rule ID `91816`
+- Wazuh rule level `4`
+- Rule description: `Powershell script querying system environment variables`
+
+Evidence:
+
+- `screenshots/22-windows-powershell-logging-enabled.png`
+- `screenshots/23a-powershell-process-query.png`
+- `screenshots/23b-powershell-local-users.png`
+- `screenshots/23c-powershell-admin-group-query.png`
+- `screenshots/24-windows-powershell-eventviewer-4104.png`
+- `screenshots/25-wazuh-powershell-event.png`
+
+Report:
+
+- `detections/windows-powershell-activity.md`
+
+Result:
+
+Wazuh detected PowerShell activity after I added the PowerShell Operational event channel to the Windows agent configuration. I am keeping this as a detection note only for now because the commands were benign enumeration commands. It proves visibility, but it does not tell a strong incident story by itself.
+
+### Issue: PowerShell Events Not Appearing in Wazuh
+
+During the PowerShell activity detection test, Windows was successfully generating PowerShell logs locally, but the events were not appearing in Wazuh at first.
+
+PowerShell script block logging was enabled and verified through the registry setting:
+
+```powershell
+Get-ItemProperty "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+```
+
+The output showed:
+
+```text
+EnableScriptBlockLogging : 1
+```
+
+Windows Event Viewer also confirmed that PowerShell Operational events were being created under:
+
+```text
+Applications and Services Logs > Microsoft > Windows > PowerShell > Operational
+```
+
+The relevant Windows event was:
+
+```text
+Event ID 4104
+```
+
+At that point, the issue was not that Windows failed to generate the logs. The issue was that the Wazuh Windows agent was not yet collecting the PowerShell Operational event channel. Wazuh was already collecting other Windows logs, but the PowerShell channel had to be added manually.
+
+To fix this, I edited the Windows agent configuration file:
+
+```text
+C:\Program Files (x86)\ossec-agent\ossec.conf
+```
+
+Inside the `<ossec_config>` section, I added:
+
+```xml
+<localfile>
+  <location>Microsoft-Windows-PowerShell/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
+```
+
+After saving the configuration, I restarted the Wazuh agent service:
+
+```powershell
+Restart-Service WazuhSvc
+Get-Service WazuhSvc
+```
+
+Then I generated fresh PowerShell activity:
+
+```powershell
+Get-LocalUser
+Get-LocalGroupMember Administrators
+```
+
+After the configuration change and service restart, Wazuh began showing PowerShell-related events from `Windows-11-Lab`. The event appeared in Threat Hunting with the rule description:
+
+```text
+Powershell script querying system environment variables
+```
+
+The Wazuh rule details were:
+
+```text
+Rule ID: 91816
+Rule Level: 4
+```
+
+This issue showed that successful local logging does not automatically mean the SIEM is collecting that log source. The endpoint must generate the event, and the Wazuh agent must also be configured to forward the correct event channel.
+
+---
+
 ## Time Zone Note
 
 During Phase 3 testing, the Windows VM and Wazuh dashboard displayed timestamps in different formats and time zones. I did not rely on timestamp display alone.
@@ -344,6 +473,7 @@ Completed detections:
 - `detections/windows-success-after-failed-logins.md`
 - `detections/windows-local-user-created.md`
 - `detections/windows-local-admin-group-change.md`
+- `detections/windows-powershell-activity.md`
 
 Incident reports:
 
@@ -352,7 +482,7 @@ Incident reports:
 
 Still left:
 
-- Complete the remaining four planned detections.
+- Complete the remaining three planned detections.
 - Capture screenshots and exported evidence for each test.
 - Add incident reports only when the activity tells a useful investigation story.
 - Keep detection reports focused on logic and validation.

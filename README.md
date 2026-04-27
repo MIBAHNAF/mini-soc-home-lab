@@ -78,7 +78,7 @@ Key Wazuh ports:
 
 ## Detection Progress
 
-Phase 3 progress: 7 of 8 planned detections complete.
+Phase 3 progress: 8 of 8 planned detections complete.
 
 | # | Detection | Status | Report |
 |---|---|---|---|
@@ -89,7 +89,7 @@ Phase 3 progress: 7 of 8 planned detections complete.
 | 5 | Windows PowerShell activity | Complete | [`windows-powershell-activity.md`](detections/windows-powershell-activity.md) |
 | 6 | Linux failed login attempts | Complete | [`linux-failed-login-attempts.md`](detections/linux-failed-login-attempts.md) |
 | 7 | Linux local user created | Complete | [`linux-local-user-created.md`](detections/linux-local-user-created.md) |
-| 8 | Linux UFW / firewall change | Planned | `detections/linux-firewall-change.md` |
+| 8 | Linux UFW / firewall change | Complete | [`linux-firewall-change.md`](detections/linux-firewall-change.md) |
 
 ## Incident Reports
 
@@ -97,6 +97,7 @@ Phase 3 progress: 7 of 8 planned detections complete.
 |---|---|---|
 | 001 | [`Failed Logins Followed by Successful Local Logon`](incident-reports/incident-001-windows-failed-logins.md) | Closed - lab validation successful |
 | 002 | [`Local Account Creation, PowerShell Enumeration, and Administrator Group Change`](incident-reports/incident-002-local-account-admin-change.md) | Closed - lab validation successful |
+| 003 | [`Linux Failed Authentication, Local User Creation, and Firewall Configuration Change`](incident-reports/incident-003-linux-auth-user-firewall.md) | Closed - lab validation successful |
 
 ## Evidence Index
 
@@ -113,7 +114,7 @@ Key evidence groups:
 - PowerShell activity: `screenshots/22-*` through `screenshots/25-*`
 - Linux failed login attempts: `screenshots/26-*` and `screenshots/27-*`
 - Linux local user creation: `screenshots/28-*` and `screenshots/29-*`
-- Planned Linux firewall detection: `screenshots/30-*` and `screenshots/31-*`
+- Linux UFW firewall change: `screenshots/30-*` through `screenshots/32-*`
 
 Exported Wazuh reports are stored in:
 
@@ -142,15 +143,13 @@ This kept validation clean even when timestamps did not visually match one-to-on
 
 ## Resume Summary
 
-Built a Mini-SOC home lab using Wazuh, Ubuntu, VMware, and a Windows 11 endpoint. Deployed and validated SIEM infrastructure, onboarded a Windows agent, generated controlled security events, created detection reports, and wrote SOC-style incident reports for failed logins, successful logon after failures, local user creation, and administrator group changes.
+Built a Mini-SOC home lab using Wazuh, Ubuntu, VMware, and a Windows 11 endpoint. Deployed and validated SIEM infrastructure, onboarded a Windows agent, generated controlled Windows and Linux security events, created detection reports, and wrote SOC-style incident reports for authentication failures, account creation, PowerShell enumeration, privilege changes, and firewall configuration changes.
 
 ## Current Status
 
-Phase 1 and Phase 2 are complete. Phase 3 is in progress with 7 of 8 planned detections complete.
+Phase 1 and Phase 2 are complete. Phase 3 now has all 8 planned detections complete, with 3 incident reports documenting the strongest activity chains.
 
 Next work:
 
-- Complete Linux UFW / firewall change.
-- Continue capturing screenshots and Wazuh evidence.
-- Add incident reports when the activity tells a useful investigation story.
 - Keep refining detections with better thresholds and context.
+- Add future detections or incident chains if the lab is expanded.

@@ -476,17 +476,16 @@ Completed detections:
 - `detections/windows-powershell-activity.md`
 - `detections/linux-failed-login-attempts.md`
 - `detections/linux-local-user-created.md`
+- `detections/linux-firewall-change.md`
 
 Incident reports:
 
 - `incident-reports/incident-001-windows-failed-logins.md`
 - `incident-reports/incident-002-local-account-admin-change.md`
+- `incident-reports/incident-003-linux-auth-user-firewall.md`
 
 Still left:
 
-- Complete Detection 8: Linux UFW / firewall change.
-- Capture screenshots and exported evidence for each test.
-- Add incident reports only when the activity tells a useful investigation story.
 - Keep detection reports focused on logic and validation.
 - Keep incident reports focused on what happened, what I saw, what I did, what it means, and what comes next.
 
@@ -583,33 +582,76 @@ Result:
 
 Wazuh detected the Linux local user creation activity from the Ubuntu host. This pairs well with the Windows local user creation detection because it proves the same account-monitoring idea on a different operating system.
 
-## Planned Detection 8 - Linux UFW / Firewall Change
+## Detection 8 - Linux UFW / Firewall Change
 
-Goal:
+What I tested:
 
 - Make a controlled firewall rule change on Ubuntu.
 - Confirm the change locally.
-- Confirm Wazuh shows the firewall-related activity if the logs are collected.
+- Confirm the exact UFW command appeared in local logs.
+- Confirm Wazuh showed related sudo activity from the Ubuntu host.
 - Clean up the test rule afterward.
 
-Command idea:
+Commands used:
 
 ```bash
 sudo ufw status
 sudo ufw allow 2222/tcp
 sudo ufw status numbered
-sudo ufw delete allow 2222/tcp
 ```
 
-Evidence to capture:
+Local log validation:
+
+```bash
+sudo grep -i "ufw.*2222\|COMMAND=.*ufw" /var/log/auth.log | tail -n 30
+```
+
+Cleanup command:
+
+```bash
+sudo ufw delete allow 2222/tcp
+sudo ufw status numbered
+```
+
+Evidence:
 
 - `screenshots/30-linux-firewall-change.png`
-- `screenshots/31-wazuh-linux-firewall-change-event.png`
+- `screenshots/31-linux-ufw-log-proof.png`
+- `screenshots/32-wazuh-linux-ufw-event.png`
 
-Report to create:
+Report:
 
 - `detections/linux-firewall-change.md`
 
-Why this matters:
+Result:
 
-This connects detection engineering to network security and system hardening. Firewall changes are important because they can expose services or create new access paths.
+The exact UFW rule change was confirmed locally in `/var/log/auth.log`, while Wazuh confirmed related sudo command ingestion from the Ubuntu host. This connects detection engineering to network security and system hardening without overstating what Wazuh proved in this specific test.
+
+## Incident 003 - Linux Authentication, Account Creation, and Firewall Change
+
+Why I grouped it:
+
+- Failed sudo/authentication attempts show possible privilege access attempts.
+- Local Linux user creation shows possible persistence.
+- Firewall configuration changes show possible host exposure changes.
+
+In this lab, all of it was expected and controlled. I documented it as one incident because the sequence is more useful than the individual alerts by themselves.
+
+Evidence:
+
+- `screenshots/26-linux-failed-login-attempts.png`
+- `screenshots/27-wazuh-linux-failed-login-events.png`
+- `screenshots/28-linux-user-created.png`
+- `screenshots/29-wazuh-linux-user-created-event.png`
+- `screenshots/30-linux-firewall-change.png`
+- `screenshots/31-linux-ufw-log-proof.png`
+- `screenshots/32-wazuh-linux-ufw-event.png`
+- `incident-reports/evidence/incident-003-linux-auth-user-firewall-report.pdf`
+
+Report:
+
+- `incident-reports/incident-003-linux-auth-user-firewall.md`
+
+Result:
+
+Incident 003 closes the Linux-side Phase 3 story. Wazuh showed Linux authentication, sudo, and account creation signals, while local Ubuntu logs confirmed the exact UFW rule change.

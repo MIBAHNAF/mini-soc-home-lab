@@ -81,12 +81,7 @@ Validation checklist:
 | PowerShell activity | `4104` | `91816` |
 | Linux failed login attempts | Linux auth logs | `5404`, `5503` |
 | Linux local user created | Linux account-management logs | `5901`, `5902` |
-
-Planned Linux-side data sources:
-
-| Planned Activity | Expected Source | Planned Report |
-|---|---|---|
-| Linux UFW / firewall change | Linux firewall or system logs | `detections/linux-firewall-change.md` |
+| Linux UFW / firewall change | Linux auth logs and related sudo activity | Local UFW proof plus Wazuh sudo ingestion |
 
 ## Timestamp Handling
 

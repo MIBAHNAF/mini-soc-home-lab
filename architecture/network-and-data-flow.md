@@ -67,6 +67,15 @@ Validation checklist:
 | Successful logon | `4624` | `67022`, `67028` |
 | Local user created | `4720` | `60109`, `60110`, `60170` |
 | Local Administrators group changed | `4732` | `60154` |
+| PowerShell activity | `4104` | `91816` |
+
+Planned Linux-side data sources:
+
+| Planned Activity | Expected Source | Planned Report |
+|---|---|---|
+| Linux failed login attempts | Linux authentication logs | `detections/linux-failed-login-attempts.md` |
+| Linux local user created | Linux account-management logs | `detections/linux-local-user-created.md` |
+| Linux UFW / firewall change | Linux firewall or system logs | `detections/linux-firewall-change.md` |
 
 ## Timestamp Handling
 

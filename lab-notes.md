@@ -482,8 +482,89 @@ Incident reports:
 
 Still left:
 
-- Complete the remaining three planned detections.
+- Complete Detection 6: Linux failed login attempts.
+- Complete Detection 7: Linux local user created.
+- Complete Detection 8: Linux UFW / firewall change.
 - Capture screenshots and exported evidence for each test.
 - Add incident reports only when the activity tells a useful investigation story.
 - Keep detection reports focused on logic and validation.
 - Keep incident reports focused on what happened, what I saw, what I did, what it means, and what comes next.
+
+## Planned Detection 6 - Linux Failed Login Attempts
+
+Goal:
+
+- Generate failed Linux authentication activity on the Ubuntu Wazuh server.
+- Confirm the activity appears locally.
+- Confirm Wazuh shows the failed login activity.
+
+Evidence to capture:
+
+- `screenshots/26-linux-failed-login-attempts.png`
+- `screenshots/27-wazuh-linux-failed-login-events.png`
+
+Report to create:
+
+- `detections/linux-failed-login-attempts.md`
+
+Why this matters:
+
+This adds Linux authentication monitoring to the lab. So far, most Phase 3 work has focused on Windows. This starts the Linux-side coverage.
+
+## Planned Detection 7 - Linux Local User Created
+
+Goal:
+
+- Create a safe test user on Ubuntu.
+- Confirm the user exists locally.
+- Confirm Wazuh detects the account creation activity.
+
+Command idea:
+
+```bash
+sudo useradd soclinuxuser
+```
+
+Evidence to capture:
+
+- `screenshots/28-linux-user-created.png`
+- `screenshots/29-wazuh-linux-user-created-event.png`
+
+Report to create:
+
+- `detections/linux-local-user-created.md`
+
+Why this matters:
+
+This pairs well with the Windows local user creation detection. Same idea, different operating system.
+
+## Planned Detection 8 - Linux UFW / Firewall Change
+
+Goal:
+
+- Make a controlled firewall rule change on Ubuntu.
+- Confirm the change locally.
+- Confirm Wazuh shows the firewall-related activity if the logs are collected.
+- Clean up the test rule afterward.
+
+Command idea:
+
+```bash
+sudo ufw status
+sudo ufw allow 2222/tcp
+sudo ufw status numbered
+sudo ufw delete allow 2222/tcp
+```
+
+Evidence to capture:
+
+- `screenshots/30-linux-firewall-change.png`
+- `screenshots/31-wazuh-linux-firewall-change-event.png`
+
+Report to create:
+
+- `detections/linux-firewall-change.md`
+
+Why this matters:
+
+This connects detection engineering to network security and system hardening. Firewall changes are important because they can expose services or create new access paths.

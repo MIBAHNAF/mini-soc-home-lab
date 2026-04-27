@@ -142,10 +142,6 @@ This kept validation clean even when timestamps did not visually match one-to-on
 - Incident-style reporting
 - Troubleshooting across network, endpoint, and SIEM layers
 
-## Resume Summary
-
-Built a Mini-SOC home lab using Wazuh, Ubuntu, VMware, and a Windows 11 endpoint. Deployed and validated SIEM infrastructure, onboarded a Windows agent, generated controlled Windows and Linux security events, created detection reports, and wrote SOC-style incident reports for authentication failures, account creation, PowerShell enumeration, privilege changes, and firewall configuration changes.
-
 ## Current Status
 
 Core project status: complete.

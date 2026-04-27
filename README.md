@@ -13,7 +13,7 @@ I wanted hands-on practice with real security operations work, not just theory. 
 The goal is not just to make alerts fire. The goal is to prove the full chain:
 
 ```text
-Windows activity -> Windows Event Log -> Wazuh agent -> Wazuh dashboard -> detection report -> incident report
+Endpoint activity -> local logs -> Wazuh collection -> Wazuh dashboard -> detection report -> incident report
 ```
 
 ## Lab Environment
@@ -74,7 +74,7 @@ Key Wazuh ports:
 |---|---|---|
 | Phase 1 | Complete | Deployed Wazuh, validated services, confirmed ports, and recovered dashboard access after a network path issue. |
 | Phase 2 | Complete | Built and onboarded the Windows 11 endpoint, confirmed active agent status, and validated first Windows event ingestion. |
-| Phase 3 | In progress | Generating Windows security activity, writing detection reports, and documenting incident-style findings. |
+| Phase 3 | Complete | Completed 8 Windows and Linux detections, captured evidence, and documented 3 incident-style investigation chains. |
 
 ## Detection Progress
 
@@ -137,6 +137,7 @@ This kept validation clean even when timestamps did not visually match one-to-on
 - Windows Event Log analysis
 - Detection engineering
 - Authentication and account-management monitoring
+- Linux authentication and firewall-change monitoring
 - Evidence collection
 - Incident-style reporting
 - Troubleshooting across network, endpoint, and SIEM layers
@@ -147,9 +148,11 @@ Built a Mini-SOC home lab using Wazuh, Ubuntu, VMware, and a Windows 11 endpoint
 
 ## Current Status
 
-Phase 1 and Phase 2 are complete. Phase 3 now has all 8 planned detections complete, with 3 incident reports documenting the strongest activity chains.
+Core project status: complete.
 
-Next work:
+Phase 1, Phase 2, and Phase 3 are complete. The lab includes 8 validated detections and 3 incident reports documenting the strongest activity chains.
+
+Optional future work:
 
 - Keep refining detections with better thresholds and context.
 - Add future detections or incident chains if the lab is expanded.

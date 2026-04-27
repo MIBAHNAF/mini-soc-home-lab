@@ -111,7 +111,7 @@ I treated this as one incident because the successful logon happened right after
 
 ### Wazuh Report
 
-- `evidence/incident-001-wazuh-threat-hunting-report.pdf.pdf`
+- `evidence/incident-001-wazuh-threat-hunting-report.pdf`
 
 ---
 

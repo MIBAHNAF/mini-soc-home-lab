@@ -1,19 +1,20 @@
 # Lab Notes
 
-These notes are the working record for the Mini-SOC lab. The README explains the project at a higher level. This file tracks what I did, what I validated, what broke or mattered, and what still needs work.
+These notes are the working record for the Mini-SOC lab. The README explains the project at a higher level. This file tracks what I did, what I validated, what broke or mattered, and what I would improve next.
 
 ## Current Status
 
-As of 2026-04-26, Phase 1 and Phase 2 are complete. Phase 3 is in progress.
+As of 2026-04-26, the core Mini-SOC project is complete.
 
 Current state:
 
 - Wazuh server is deployed and reachable.
 - Windows endpoint `Windows-11-Lab` is onboarded and active.
 - Windows events are reaching Wazuh Threat Hunting.
-- Six of eight planned detections are complete.
-- Two incident-style reports are started.
-- Remaining Phase 3 work: two detections plus any follow-up incident reports that make sense.
+- Linux-side authentication, account-management, and firewall-change activity was validated.
+- Eight of eight planned detections are complete.
+- Three incident-style reports are complete.
+- Remaining work is optional tuning, cleanup, and future lab expansion.
 
 Lab systems:
 
@@ -484,7 +485,7 @@ Incident reports:
 - `incident-reports/incident-002-local-account-admin-change.md`
 - `incident-reports/incident-003-linux-auth-user-firewall.md`
 
-Still left:
+Wrap-up notes:
 
 - Keep detection reports focused on logic and validation.
 - Keep incident reports focused on what happened, what I saw, what I did, what it means, and what comes next.

@@ -68,7 +68,8 @@ Current Phase 3 status:
 
 - 8 of 8 planned detections complete
 - 3 incident reports completed
-- Remaining work is focused on optional incident chains, evidence cleanup, and detection tuning
+- Core architecture documentation is complete for the current lab scope
+- Future work would be optional expansion, evidence cleanup, and detection tuning
 
 ## Assumptions
 

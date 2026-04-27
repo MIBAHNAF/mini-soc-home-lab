@@ -44,7 +44,7 @@ Linux activity
     -> Detection report
 ```
 
-## Step-by-Step Flow
+## Windows Step-by-Step Flow
 
 1. Activity happens on `Windows-11-Lab`.
 2. Windows writes the event to Event Viewer.
@@ -55,6 +55,16 @@ Linux activity
 7. I compare the Wazuh event with the local Windows evidence.
 8. I document the detection or incident.
 
+## Linux Step-by-Step Flow
+
+1. Activity happens on the Ubuntu Wazuh server.
+2. Ubuntu writes the activity to local logs like `/var/log/auth.log` or `/var/log/syslog`.
+3. Wazuh collects the local Linux log activity.
+4. Wazuh indexes and enriches the event.
+5. I review the event in Threat Hunting.
+6. I compare the Wazuh event with local Ubuntu evidence.
+7. I document the detection or incident.
+
 ## Validation Points
 
 I do not count a detection as validated just because one screen shows an alert. I check the full chain.
@@ -62,11 +72,11 @@ I do not count a detection as validated just because one screen shows an alert. 
 Validation checklist:
 
 - Endpoint generated the activity.
-- Windows Event Viewer showed the expected event.
-- Wazuh showed the same activity from `Windows-11-Lab`.
-- Agent ID matched `001`.
+- The local system showed the expected event or command evidence.
+- Wazuh showed the same or related activity from the correct host.
+- Agent ID or hostname matched the expected system.
 - Event or rule description matched the test.
-- Windows Event ID matched the expected behavior.
+- Windows Event ID or Linux log evidence matched the expected behavior.
 - Wazuh rule ID matched the expected behavior.
 - Screenshots or exported evidence were captured.
 

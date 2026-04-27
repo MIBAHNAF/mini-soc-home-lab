@@ -4,16 +4,16 @@ These notes are the working record for the Mini-SOC lab. The README explains the
 
 ## Current Status
 
-As of 2026-04-25, Phase 1 and Phase 2 are complete. Phase 3 is in progress.
+As of 2026-04-26, Phase 1 and Phase 2 are complete. Phase 3 is in progress.
 
 Current state:
 
 - Wazuh server is deployed and reachable.
 - Windows endpoint `Windows-11-Lab` is onboarded and active.
 - Windows events are reaching Wazuh Threat Hunting.
-- Five of eight planned detections are complete.
+- Six of eight planned detections are complete.
 - Two incident-style reports are started.
-- Remaining Phase 3 work: three detections plus any follow-up incident reports that make sense.
+- Remaining Phase 3 work: two detections plus any follow-up incident reports that make sense.
 
 Lab systems:
 
@@ -474,6 +474,7 @@ Completed detections:
 - `detections/windows-local-user-created.md`
 - `detections/windows-local-admin-group-change.md`
 - `detections/windows-powershell-activity.md`
+- `detections/linux-failed-login-attempts.md`
 
 Incident reports:
 
@@ -482,7 +483,6 @@ Incident reports:
 
 Still left:
 
-- Complete Detection 6: Linux failed login attempts.
 - Complete Detection 7: Linux local user created.
 - Complete Detection 8: Linux UFW / firewall change.
 - Capture screenshots and exported evidence for each test.
@@ -490,26 +490,53 @@ Still left:
 - Keep detection reports focused on logic and validation.
 - Keep incident reports focused on what happened, what I saw, what I did, what it means, and what comes next.
 
-## Planned Detection 6 - Linux Failed Login Attempts
+## Detection 6 - Linux Failed Login Attempts
 
-Goal:
+What I tested:
 
-- Generate failed Linux authentication activity on the Ubuntu Wazuh server.
-- Confirm the activity appears locally.
-- Confirm Wazuh shows the failed login activity.
+- Tried to switch to a nonexistent user.
+- Forced a fresh sudo authentication prompt.
+- Entered incorrect passwords for a sudo command.
+- Confirmed failed authentication activity locally in `/var/log/auth.log`.
+- Confirmed Wazuh showed the Linux authentication alerts.
 
-Evidence to capture:
+Commands used:
+
+```bash
+su fakeuser
+sudo -k
+sudo ls /root
+```
+
+Local validation command:
+
+```bash
+sudo grep -i "authentication failure\|incorrect password\|FAILED su\|3 incorrect password attempts" /var/log/auth.log | tail -n 30
+```
+
+Validated events:
+
+- PAM authentication failure
+- Failed `sudo` authentication
+- Wazuh rule ID `5404`
+- Wazuh rule level `10`
+- Rule description: `Three failed attempts to run sudo`
+- Wazuh rule ID `5503`
+- Wazuh rule level `5`
+- Rule description: `PAM: User login failed`
+
+Evidence:
 
 - `screenshots/26-linux-failed-login-attempts.png`
 - `screenshots/27-wazuh-linux-failed-login-events.png`
 
-Report to create:
+Report:
 
 - `detections/linux-failed-login-attempts.md`
 
-Why this matters:
+Result:
 
-This adds Linux authentication monitoring to the lab. So far, most Phase 3 work has focused on Windows. This starts the Linux-side coverage.
+Wazuh detected the Linux failed authentication activity from the Ubuntu host. This starts the Linux-side detection coverage and proves Wazuh can show failed `sudo` and PAM authentication events.
 
 ## Planned Detection 7 - Linux Local User Created
 

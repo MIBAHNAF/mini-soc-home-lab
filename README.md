@@ -78,7 +78,7 @@ Key Wazuh ports:
 
 ## Detection Progress
 
-Phase 3 progress: 5 of 8 planned detections complete.
+Phase 3 progress: 6 of 8 planned detections complete.
 
 | # | Detection | Status | Report |
 |---|---|---|---|
@@ -87,7 +87,7 @@ Phase 3 progress: 5 of 8 planned detections complete.
 | 3 | Windows local user created | Complete | [`windows-local-user-created.md`](detections/windows-local-user-created.md) |
 | 4 | Windows local administrator group change | Complete | [`windows-local-admin-group-change.md`](detections/windows-local-admin-group-change.md) |
 | 5 | Windows PowerShell activity | Complete | [`windows-powershell-activity.md`](detections/windows-powershell-activity.md) |
-| 6 | Linux failed login attempts | Planned | `detections/linux-failed-login-attempts.md` |
+| 6 | Linux failed login attempts | Complete | [`linux-failed-login-attempts.md`](detections/linux-failed-login-attempts.md) |
 | 7 | Linux local user created | Planned | `detections/linux-local-user-created.md` |
 | 8 | Linux UFW / firewall change | Planned | `detections/linux-firewall-change.md` |
 
@@ -111,7 +111,8 @@ Key evidence groups:
 - Local user creation: `screenshots/18*` and `screenshots/19-*`
 - Local administrator group change: `screenshots/20*` and `screenshots/21-*`
 - PowerShell activity: `screenshots/22-*` through `screenshots/25-*`
-- Planned Linux detections: `screenshots/26-*` through `screenshots/31-*`
+- Linux failed login attempts: `screenshots/26-*` and `screenshots/27-*`
+- Planned Linux detections: `screenshots/28-*` through `screenshots/31-*`
 
 Exported Wazuh reports are stored in:
 
@@ -144,11 +145,10 @@ Built a Mini-SOC home lab using Wazuh, Ubuntu, VMware, and a Windows 11 endpoint
 
 ## Current Status
 
-Phase 1 and Phase 2 are complete. Phase 3 is in progress with 5 of 8 planned detections complete.
+Phase 1 and Phase 2 are complete. Phase 3 is in progress with 6 of 8 planned detections complete.
 
 Next work:
 
-- Complete Linux failed login attempts.
 - Complete Linux local user creation.
 - Complete Linux UFW / firewall change.
 - Continue capturing screenshots and Wazuh evidence.

@@ -65,9 +65,9 @@ Current lab scope:
 
 Current Phase 3 status:
 
-- 5 of 8 planned detections complete
+- 6 of 8 planned detections complete
 - 2 incident reports started
-- Remaining work moves into Linux-side detection coverage, evidence capture, and detection tuning
+- Remaining work continues Linux-side detection coverage, evidence capture, and detection tuning
 
 ## Assumptions
 

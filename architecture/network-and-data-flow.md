@@ -33,6 +33,17 @@ Windows activity
     -> Detection report or incident report
 ```
 
+For Linux-side tests on the Ubuntu Wazuh server, the flow is slightly shorter:
+
+```text
+Linux activity
+    -> Linux authentication / system logs
+    -> Wazuh manager local log collection
+    -> Wazuh indexer
+    -> Wazuh dashboard / Threat Hunting
+    -> Detection report
+```
+
 ## Step-by-Step Flow
 
 1. Activity happens on `Windows-11-Lab`.
@@ -69,12 +80,12 @@ Validation checklist:
 | Local Administrators group changed | `4732` | `60154` |
 | PowerShell activity | `4104` | `91816` |
 | Linux failed login attempts | Linux auth logs | `5404`, `5503` |
+| Linux local user created | Linux account-management logs | `5901`, `5902` |
 
 Planned Linux-side data sources:
 
 | Planned Activity | Expected Source | Planned Report |
 |---|---|---|
-| Linux local user created | Linux account-management logs | `detections/linux-local-user-created.md` |
 | Linux UFW / firewall change | Linux firewall or system logs | `detections/linux-firewall-change.md` |
 
 ## Timestamp Handling

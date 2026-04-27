@@ -306,7 +306,7 @@ Evidence:
 - `screenshots/20a-windows-admin-group-change.png`
 - `screenshots/20b-windows-admin-group-change.png`
 - `screenshots/21-wazuh-privilege-change-event.png`
-- `incident-reports/evidence/incident-002-local-account-admin-change-report.pdf`
+- `incident-reports/evidence/incident-002-local-account-powershell-admin-change-report.pdf`
 
 Reports:
 
@@ -370,7 +370,7 @@ Report:
 
 Result:
 
-Wazuh detected PowerShell activity after I added the PowerShell Operational event channel to the Windows agent configuration. I am keeping this as a detection note only for now because the commands were benign enumeration commands. It proves visibility, but it does not tell a strong incident story by itself.
+Wazuh detected PowerShell activity after I added the PowerShell Operational event channel to the Windows agent configuration. I kept the standalone PowerShell writeup as a detection note because the commands were benign enumeration commands. I also linked the PowerShell activity into Incident 002 because it fits the larger activity chain: local account creation, PowerShell enumeration, and administrator group change.
 
 ### Issue: PowerShell Events Not Appearing in Wazuh
 
@@ -475,6 +475,7 @@ Completed detections:
 - `detections/windows-local-admin-group-change.md`
 - `detections/windows-powershell-activity.md`
 - `detections/linux-failed-login-attempts.md`
+- `detections/linux-local-user-created.md`
 
 Incident reports:
 
@@ -483,7 +484,6 @@ Incident reports:
 
 Still left:
 
-- Complete Detection 7: Linux local user created.
 - Complete Detection 8: Linux UFW / firewall change.
 - Capture screenshots and exported evidence for each test.
 - Add incident reports only when the activity tells a useful investigation story.
@@ -538,32 +538,50 @@ Result:
 
 Wazuh detected the Linux failed authentication activity from the Ubuntu host. This starts the Linux-side detection coverage and proves Wazuh can show failed `sudo` and PAM authentication events.
 
-## Planned Detection 7 - Linux Local User Created
+## Detection 7 - Linux Local User Created
 
-Goal:
+What I tested:
 
 - Create a safe test user on Ubuntu.
 - Confirm the user exists locally.
 - Confirm Wazuh detects the account creation activity.
+- Confirm related sudo and PAM session events were visible around the same time.
 
-Command idea:
+Commands used:
 
 ```bash
-sudo useradd soclinuxuser
+sudo useradd -m soclinuxuser
+id soclinuxuser
+getent passwd soclinuxuser
 ```
 
-Evidence to capture:
+Validated events:
+
+- Wazuh rule ID `5901`
+- Wazuh rule level `8`
+- Rule description: `New group added to the system`
+- Wazuh rule ID `5902`
+- Wazuh rule level `8`
+- Rule description: `New user added to the system`
+- Wazuh rule ID `5402`
+- Rule description: `Successful sudo to ROOT executed`
+- Wazuh rule ID `5501`
+- Rule description: `PAM: Login session opened`
+- Wazuh rule ID `5502`
+- Rule description: `PAM: Login session closed`
+
+Evidence:
 
 - `screenshots/28-linux-user-created.png`
 - `screenshots/29-wazuh-linux-user-created-event.png`
 
-Report to create:
+Report:
 
 - `detections/linux-local-user-created.md`
 
-Why this matters:
+Result:
 
-This pairs well with the Windows local user creation detection. Same idea, different operating system.
+Wazuh detected the Linux local user creation activity from the Ubuntu host. This pairs well with the Windows local user creation detection because it proves the same account-monitoring idea on a different operating system.
 
 ## Planned Detection 8 - Linux UFW / Firewall Change
 

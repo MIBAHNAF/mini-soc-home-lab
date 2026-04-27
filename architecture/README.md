@@ -2,9 +2,9 @@
 
 ## Overview
 
-This lab is a small SOC environment built in VMware. The goal is simple: generate Windows security activity, send it to Wazuh, and validate detections from the SIEM side.
+This lab is a small SOC environment built in VMware. The goal is simple: generate Windows and Linux security activity, send it to Wazuh, and validate detections from the SIEM side.
 
-The setup has one Wazuh server and one Windows endpoint. The Windows endpoint sends logs to the Wazuh server, and I review the events in the Wazuh dashboard under Threat Hunting.
+The setup has one Wazuh server and one Windows endpoint. The Windows endpoint sends logs to the Wazuh server, and the Ubuntu server also provides Linux-side authentication and system activity for testing. I review the events in the Wazuh dashboard under Threat Hunting.
 
 ## Lab Components
 
@@ -61,11 +61,12 @@ Current lab scope:
 - One Windows 11 endpoint
 - One active Wazuh agent
 - Windows authentication and account-management detections
+- Linux authentication and account-management detections
 - Incident-style writeups for activity that tells a useful investigation story
 
 Current Phase 3 status:
 
-- 6 of 8 planned detections complete
+- 7 of 8 planned detections complete
 - 2 incident reports started
 - Remaining work continues Linux-side detection coverage, evidence capture, and detection tuning
 

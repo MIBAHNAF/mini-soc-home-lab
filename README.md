@@ -78,7 +78,7 @@ Key Wazuh ports:
 
 ## Detection Progress
 
-Phase 3 progress: 6 of 8 planned detections complete.
+Phase 3 progress: 7 of 8 planned detections complete.
 
 | # | Detection | Status | Report |
 |---|---|---|---|
@@ -88,7 +88,7 @@ Phase 3 progress: 6 of 8 planned detections complete.
 | 4 | Windows local administrator group change | Complete | [`windows-local-admin-group-change.md`](detections/windows-local-admin-group-change.md) |
 | 5 | Windows PowerShell activity | Complete | [`windows-powershell-activity.md`](detections/windows-powershell-activity.md) |
 | 6 | Linux failed login attempts | Complete | [`linux-failed-login-attempts.md`](detections/linux-failed-login-attempts.md) |
-| 7 | Linux local user created | Planned | `detections/linux-local-user-created.md` |
+| 7 | Linux local user created | Complete | [`linux-local-user-created.md`](detections/linux-local-user-created.md) |
 | 8 | Linux UFW / firewall change | Planned | `detections/linux-firewall-change.md` |
 
 ## Incident Reports
@@ -96,7 +96,7 @@ Phase 3 progress: 6 of 8 planned detections complete.
 | # | Incident Report | Status |
 |---|---|---|
 | 001 | [`Failed Logins Followed by Successful Local Logon`](incident-reports/incident-001-windows-failed-logins.md) | Closed - lab validation successful |
-| 002 | [`Local Account Creation and Administrator Group Change`](incident-reports/incident-002-local-account-admin-change.md) | Closed - lab validation successful |
+| 002 | [`Local Account Creation, PowerShell Enumeration, and Administrator Group Change`](incident-reports/incident-002-local-account-admin-change.md) | Closed - lab validation successful |
 
 ## Evidence Index
 
@@ -112,7 +112,8 @@ Key evidence groups:
 - Local administrator group change: `screenshots/20*` and `screenshots/21-*`
 - PowerShell activity: `screenshots/22-*` through `screenshots/25-*`
 - Linux failed login attempts: `screenshots/26-*` and `screenshots/27-*`
-- Planned Linux detections: `screenshots/28-*` through `screenshots/31-*`
+- Linux local user creation: `screenshots/28-*` and `screenshots/29-*`
+- Planned Linux firewall detection: `screenshots/30-*` and `screenshots/31-*`
 
 Exported Wazuh reports are stored in:
 
@@ -145,11 +146,10 @@ Built a Mini-SOC home lab using Wazuh, Ubuntu, VMware, and a Windows 11 endpoint
 
 ## Current Status
 
-Phase 1 and Phase 2 are complete. Phase 3 is in progress with 6 of 8 planned detections complete.
+Phase 1 and Phase 2 are complete. Phase 3 is in progress with 7 of 8 planned detections complete.
 
 Next work:
 
-- Complete Linux local user creation.
 - Complete Linux UFW / firewall change.
 - Continue capturing screenshots and Wazuh evidence.
 - Add incident reports when the activity tells a useful investigation story.

@@ -62,6 +62,12 @@ Get-LocalGroupMember Administrators
 
 The Windows Wazuh agent was updated to collect the PowerShell Operational event channel.
 
+The agent configuration file updated was:
+
+```text
+C:\Program Files (x86)\ossec-agent\ossec.conf
+```
+
 ```xml
 <localfile>
   <location>Microsoft-Windows-PowerShell/Operational</location>
@@ -75,6 +81,26 @@ After updating the agent configuration, I restarted the Wazuh agent service.
 Restart-Service WazuhSvc
 Get-Service WazuhSvc
 ```
+
+## Collection Issue Encountered
+
+During testing, PowerShell activity was visible locally in Windows Event Viewer but did not appear in Wazuh at first.
+
+Script block logging was enabled successfully, and Windows generated Event ID `4104` under:
+
+```text
+Applications and Services Logs > Microsoft > Windows > PowerShell > Operational
+```
+
+This confirmed that the endpoint was producing PowerShell telemetry. The issue was not local Windows logging. The issue was that Wazuh was not ingesting those events yet because the Windows agent was not configured to collect the `Microsoft-Windows-PowerShell/Operational` event channel.
+
+To fix this, I added the PowerShell Operational event channel to:
+
+```text
+C:\Program Files (x86)\ossec-agent\ossec.conf
+```
+
+After the configuration was added and the Wazuh agent service was restarted, PowerShell events appeared in Wazuh Threat Hunting.
 
 ## Validation
 

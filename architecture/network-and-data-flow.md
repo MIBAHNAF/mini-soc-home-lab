@@ -93,6 +93,22 @@ Validation checklist:
 | Linux local user created | Linux account-management logs | `5901`, `5902` |
 | Linux UFW / firewall change | Linux auth logs and related sudo activity | Local UFW proof plus Wazuh sudo ingestion |
 
+## Collection Notes
+
+PowerShell required one extra collection step. Windows generated Event ID `4104` locally under the PowerShell Operational log, but Wazuh did not ingest it until the Windows agent was configured to collect:
+
+```text
+Microsoft-Windows-PowerShell/Operational
+```
+
+That was added to the Windows agent configuration at:
+
+```text
+C:\Program Files (x86)\ossec-agent\ossec.conf
+```
+
+This is an important validation lesson for the lab: local event generation and SIEM ingestion are two separate checkpoints.
+
 ## Timestamp Handling
 
 During Phase 3, Windows Event Viewer and Wazuh did not always display timestamps in the same format or time zone.

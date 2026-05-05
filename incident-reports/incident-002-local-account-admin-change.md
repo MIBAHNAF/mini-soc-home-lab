@@ -67,6 +67,27 @@ After the local account was created, benign PowerShell enumeration commands were
 
 Wazuh ingested the PowerShell activity and displayed events with rule ID `91816`, described as `Powershell script querying system environment variables`. This confirmed that PowerShell telemetry was being collected after the PowerShell Operational log channel was added to the Windows Wazuh agent configuration.
 
+### Collection Issue Encountered
+
+During testing, PowerShell activity was visible locally in Windows Event Viewer but did not appear in Wazuh at first. Script block logging was enabled successfully, and Windows generated Event ID `4104` under:
+
+```text
+Applications and Services Logs > Microsoft > Windows > PowerShell > Operational
+```
+
+This confirmed that the endpoint was producing PowerShell telemetry. Wazuh was not ingesting the events yet because the Windows agent was not configured to collect the `Microsoft-Windows-PowerShell/Operational` event channel.
+
+To fix the collection gap, I added the following event channel to the Windows Wazuh agent configuration file at `C:\Program Files (x86)\ossec-agent\ossec.conf`:
+
+```xml
+<localfile>
+  <location>Microsoft-Windows-PowerShell/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
+```
+
+After the agent configuration was updated and the Wazuh agent service was restarted, Wazuh began showing PowerShell-related events from `Windows-11-Lab`.
+
 The most important alert remained `Administrators Group Changed`. Wazuh mapped that to rule ID `60154` and marked it as rule level `12`.
 
 I treated this as one incident because the full sequence tells a stronger story than any single event by itself:
